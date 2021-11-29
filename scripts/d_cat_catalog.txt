@@ -1,0 +1,20 @@
+-- Table: public.d_cat_catalog
+
+-- DROP TABLE IF EXISTS public.d_cat_catalog;
+
+CREATE TABLE IF NOT EXISTS public.d_cat_catalog
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 100000 CACHE 1 ),
+    company character varying COLLATE pg_catalog."default",
+    uuid character varying COLLATE pg_catalog."default" NOT NULL,
+    delivery_date timestamp without time zone,
+    CONSTRAINT "D_CAT_CATALOG_pkey" PRIMARY KEY (id),
+    CONSTRAINT uuid UNIQUE (uuid)
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.d_cat_catalog
+    OWNER to postgres;

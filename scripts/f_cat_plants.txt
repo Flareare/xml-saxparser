@@ -1,0 +1,28 @@
+-- Table: public.f_cat_plants
+
+-- DROP TABLE IF EXISTS public.f_cat_plants;
+
+CREATE TABLE IF NOT EXISTS public.f_cat_plants
+(
+    id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 100000 CACHE 1 ),
+    common character varying COLLATE pg_catalog."default",
+    botanical character varying COLLATE pg_catalog."default",
+    zone character varying COLLATE pg_catalog."default",
+    light character varying COLLATE pg_catalog."default",
+    price numeric,
+    availability integer,
+    catalog_id integer,
+    CONSTRAINT f_cat_plants_pkey PRIMARY KEY (id),
+    CONSTRAINT catalog_id FOREIGN KEY (catalog_id)
+        REFERENCES public.d_cat_catalog (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.f_cat_plants
+    OWNER to postgres;

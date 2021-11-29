@@ -161,6 +161,14 @@ public class SAXparserHandler extends DefaultHandler {
             try {
                 //Получение данных
                 String uuid = catalog.getUuid();
+                //выборка uuid из каталогов, которые = catalog.getUuid()
+                sql = "SELECT uuid FROM d_cat_catalog WHERE uuid='" + uuid + "'";
+                Statement stm = con.createStatement();
+                ResultSet resultSet = stm.executeQuery(sql);
+                if (resultSet.next()){//если совпадения обнаружены то такой каталог уже есть
+                    System.out.printf("Каталог с uuid='%s' компании %s уже существует\n", uuid, company);
+                    return;
+                }
                 String date = catalog.getDate();
                 //преобразование String в Timestamp
                 Timestamp newDateFormat = new Timestamp(new SimpleDateFormat("dd.MM.yyyy").parse(date).getTime());
@@ -177,18 +185,14 @@ public class SAXparserHandler extends DefaultHandler {
                 try {
                     stmt.executeUpdate();
                 } catch (SQLException e) {
-                    if (e.getSQLState().equals("23505")) { //Нарушение уникальности первичного ключа
-                        System.out.printf("Каталог с uuid='%s' компании %s уже существует\n", uuid, company);
-                    } else {
-                        e.printStackTrace();
-                    }
+                    e.printStackTrace();
                     return;
                 }
                 System.out.printf("Каталог с uuid='%s' компании %s добавлен \n", uuid, company);
                 //Получение id добавленного каталога
                 sql = "SELECT id FROM d_cat_catalog WHERE uuid='" + uuid + "'";
-                Statement stm = con.createStatement();
-                ResultSet resultSet = stm.executeQuery(sql);
+                stm = con.createStatement();
+                resultSet = stm.executeQuery(sql);
                 int catalogID;
                 resultSet.next();
                 catalogID = resultSet.getInt("id");
@@ -214,15 +218,10 @@ public class SAXparserHandler extends DefaultHandler {
                     stmt.setInt(6, availability);
                     stmt.setInt(7, catalogID);
                     try {
-                        stmt.executeUpdate();
+                        stmt.executeUpdate();   //commit убрана проверка на уникальность растения
                     } catch (SQLException e) {
-                        if (e.getSQLState().equals("23505")) { //Нарушение уникальности первичного ключа
-                            System.out.printf("  Расстение %s уже существует в БД. Запись пропущена.\n", common);
-                            continue; //Переход на следующее расстение
-                        } else {
-                            e.printStackTrace();
-                            return;
-                        }
+                        e.printStackTrace();
+                        return;
                     }
                     System.out.printf(" Расстение %s добавлено в каталог с uuid='%s' компании %s.\n", common, uuid, company);
                 }
